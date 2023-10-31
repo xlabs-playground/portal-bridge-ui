@@ -1,8 +1,28 @@
 name: Portal Bridge [Preview]
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      connect-repository:
+        description: 'connect repository bame'
+        required: true
+        default: 'wormhole-foundation/wormhole-connect'
+      connect-branch:
+        description: 'connect branch bame'
+        required: true
+        default: 'portal-bridge'
+      portal-branch:
+        description: 'portal branch bame'
+        required: true
+        default: 'advance'
+      network:
+        type: choice
+        description: 'cluster branch bame'
+        required: true
+        default: 'testnet'
+        options: 
+          - testnet
+          - mainnet
 
 jobs:
   branch-sha:
@@ -13,7 +33,7 @@ jobs:
     steps:
       - name: Set Version
         id: set-version
-        run: echo "_BRANCH_NAME_SHA=$(echo ${{ github.event.pull_request.head.ref }} | sha256sum | cut -c -10)" >> "${GITHUB_OUTPUT}"
+        run: echo "_BRANCH_NAME_SHA=$(echo ${{ inputs.connect-branch }}_${{ inputs.portal-branch }} | sha256sum | cut -c -10)" >> "${GITHUB_OUTPUT}"
 
   docs:
     name: "Build Portal Bridge Documentation"
@@ -57,6 +77,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          repository: ${{ inputs.connect-repository }}
+          ref: ${{ inputs.connect-branch }}
+          path: apps/portal
       - name: Set up Node environment
         uses: actions/setup-node@v3
         with:
@@ -78,7 +102,7 @@ jobs:
         env:
           PUBLIC_URL: "/${{ needs.branch-sha.outputs.value }}/advance"
           NODE_OPTIONS: "--max-old-space-size=10240"
-          REACT_APP_CLUSTER: ${{ vars.REACT_APP_CLUSTER }}
+          REACT_APP_CLUSTER: ${{ inputs.network }}
           REACT_APP_SOLANA_API_URL: ${{ vars.REACT_APP_SOLANA_API_URL }}
           REACT_APP_COVALENT_API_KEY: ${{ secrets.REACT_APP_COVALENT_API_KEY }}
           REACT_APP_WALLET_CONNECT_PROJECT_ID: ${{ secrets.REACT_APP_WALLET_CONNECT_PROJECT_ID }}
@@ -114,8 +138,8 @@ jobs:
       - name: Checkout Wormhole Connect
         uses: actions/checkout@v3
         with:
-          repository: xlabs/wormhole-connect
-          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{ inputs.connect-repository }}
+          ref: ${{ inputs.connect-branch }}
           path: wormhole-connect
       - name: Checkout Portal Bridge
         uses: actions/checkout@v3
@@ -136,7 +160,7 @@ jobs:
         env:
           PUBLIC_URL: "/${{ needs.branch-sha.outputs.value }}"
           VITE_APP_VERSION: ${{ steps.set-version.outputs._PKG_VERSION }}
-          VITE_APP_CLUSTER: ${{ vars.REACT_APP_CLUSTER }}
+          VITE_APP_CLUSTER: ${{ inputs.network }}
           VITE_APP_ADVANCE_PATH: "/${{ needs.branch-sha.outputs.value }}/advance"
         run: |
           npm install -g husky
