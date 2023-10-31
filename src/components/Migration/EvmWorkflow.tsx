@@ -32,7 +32,7 @@ export default function EvmWorkflow({
 }) {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-  const { signer, signerAddress } = useEthereumProvider(chainId);
+  const { signer, signerAddress } = useEthereumProvider(chainId as any);
   const { isReady } = useIsWalletReady(chainId);
   const [toggleRefresh, setToggleRefresh] = useState(false);
   const forceRefresh = useCallback(
@@ -223,7 +223,11 @@ export default function EvmWorkflow({
             Successfully migrated your tokens! They will be available once this
             transaction confirms.
           </Typography>
-          <ShowTx tx={{ id: transaction, block: 1 }} chainId={chainId} />
+          <ShowTx
+            tx={{ id: transaction, block: 1 }}
+            chainId={chainId}
+            showWormscanLink={false}
+          />
         </>
       ) : null}
     </>

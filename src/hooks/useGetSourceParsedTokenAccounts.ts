@@ -18,6 +18,7 @@ import {
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
+  CHAIN_ID_SEI,
   isEVMChain,
   isTerraChain,
   ethers_contracts,
@@ -1192,7 +1193,7 @@ function useGetAvailableTokens(nft: boolean = false) {
     nft ? selectNFTSourceChain : selectTransferSourceChain
   );
   const { publicKey: solPK, wallet: solanaWallet } = useSolanaWallet();
-  const { provider, signerAddress } = useEthereumProvider(lookupChain);
+  const { provider, signerAddress } = useEthereumProvider(lookupChain as any);
   const { address: algoAccount } = useAlgorandWallet();
   const { accountId: nearAccountId } = useNearContext();
   const { account: aptosAddress } = useAptosContext();
@@ -2003,13 +2004,23 @@ function useGetAvailableTokens(nft: boolean = false) {
     output.isFetching = output.isFetching || ethNativeAccountLoading;
     output.error = output.error || ethNativeAccountError;
 
+    // To avoid have two MATIC in the list (issue: https://github.com/XLabs/portal-bridge-ui/issues/170)
+    if (
+      lookupChain === CHAIN_ID_POLYGON &&
+      ethNativeAccount?.symbol === output.data[0]?.symbol &&
+      ethNativeAccount?.amount === output.data[0]?.amount
+    ) {
+      output.data && output.data.shift();
+    }
     ethNativeAccount && output.data && output.data.unshift(ethNativeAccount);
+
     return output;
   }, [
-    ethNativeAccount,
+    tokenAccounts,
     ethNativeAccountLoading,
     ethNativeAccountError,
-    tokenAccounts,
+    ethNativeAccount,
+    lookupChain,
   ]);
 
   return lookupChain === CHAIN_ID_SOLANA
@@ -2064,6 +2075,10 @@ function useGetAvailableTokens(nft: boolean = false) {
     : lookupChain === CHAIN_ID_SUI
     ? {
         tokenAccounts,
+        resetAccounts: resetSourceAccounts,
+      }
+    : lookupChain === CHAIN_ID_SEI
+    ? {
         resetAccounts: resetSourceAccounts,
       }
     : undefined;

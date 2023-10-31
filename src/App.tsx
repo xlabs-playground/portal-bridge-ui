@@ -5,6 +5,8 @@ import {
 } from "@certusone/wormhole-sdk";
 import {
   AppBar,
+  Box,
+  Chip,
   Container,
   Hidden,
   IconButton,
@@ -76,20 +78,6 @@ const useStyles = makeStyles((theme) => ({
       textDecoration: "underline",
     },
   },
-  bannerLink: {
-    display: "inline-flex",
-    alignItems: "center",
-    borderRadius: 20,
-    padding: "6px 12px",
-    backgroundColor: "white",
-    color: "#F47B48",
-    marginLeft: "8px",
-    fontSize: "12px",
-    letterSpacing: "0.08em",
-    fontWeight: 600,
-    minHeight: "32px",
-    minWidth: "fit-content",
-  },
   bg: {
     // background:
     //   "linear-gradient(160deg, rgba(69,74,117,.1) 0%, rgba(138,146,178,.1) 33%, rgba(69,74,117,.1) 66%, rgba(98,104,143,.1) 100%), linear-gradient(45deg, rgba(153,69,255,.1) 0%, rgba(121,98,231,.1) 20%, rgba(0,209,140,.1) 100%)",
@@ -140,7 +128,7 @@ const useStyles = makeStyles((theme) => ({
       "radial-gradient(closest-side at 50% 50%, #FFCE00 0%, #FFCE0000 100%)",
     opacity: "0.2",
     transform: "matrix(0.87, 0.48, -0.48, 0.87, 0, 0)",
-    zIndex: "-1",
+    zIndex: -1,
     pointerEvent: "none",
     [theme.breakpoints.down("sm")]: {
       display: "none",
@@ -155,7 +143,7 @@ const useStyles = makeStyles((theme) => ({
     background:
       "radial-gradient(closest-side at 50% 50%, #F44B1B 0%, #F44B1B00 100%)",
     opacity: "0.2",
-    zIndex: "-1",
+    zIndex: -1,
     pointerEvent: "none",
   },
   gradientLeft2: {
@@ -167,7 +155,7 @@ const useStyles = makeStyles((theme) => ({
     background:
       "radial-gradient(closest-side at 50% 50%, #F44B1B 0%, #F44B1B00 100%)",
     opacity: "0.2",
-    zIndex: "-1",
+    zIndex: -1,
     pointerEvent: "none",
     [theme.breakpoints.down("sm")]: {
       display: "none",
@@ -183,11 +171,22 @@ const useStyles = makeStyles((theme) => ({
       "radial-gradient(closest-side at 50% 50%, #FFCE00 0%, #FFCE0000 100%)",
     opacity: "0.24",
     transform: "matrix(0.87, 0.48, -0.48, 0.87, 0, 0);",
-    zIndex: "-1",
+    zIndex: -1,
     pointerEvent: "none",
     [theme.breakpoints.down("sm")]: {
       display: "none",
     },
+  },
+  newTag: {
+    position: "relative",
+    left: "-10px",
+    bottom: "24px",
+    backgroundColor: "#3B3785",
+    color: "#E2E1FF",
+    fontSize: "10px",
+    fontWeight: 600,
+    lineHeight: "24px",
+    wordWrap: "break-word",
   },
 }));
 
@@ -197,30 +196,15 @@ function App() {
   const { push } = useHistory();
   const { pathname } = useLocation();
   const handleTabChange = useCallback(
-    (event, value) => {
+    (_, value) => {
       push(value);
     },
     [push]
   );
+
   return (
     <div className={classes.bg}>
-      <NewsBar>
-        <>
-          <span>
-            Experience frictionless USDC transfers between Ethereum, Avalanche,
-            and Arbitrum with Circle's CCTP.{" "}
-          </span>
-          <Link
-            href="https://portalbridge.com/usdc-bridge"
-            target="_blank"
-            rel="noopener noreferrer"
-            color="inherit"
-            className={classes.bannerLink}
-          >
-            TRY IT NOW
-          </Link>
-        </>
-      </NewsBar>
+      <NewsBar />
       <AppBar
         position="static"
         color="inherit"
@@ -247,25 +231,34 @@ function App() {
                 Token Bridge
               </Link>
               <Link
-                href="https://portalbridge.com/usdc-bridge"
+                href={`${process.env.PUBLIC_URL}/usdc-bridge`}
                 target="_blank"
                 rel="noopener noreferrer"
                 color="inherit"
                 className={classes.link}
               >
-                USDC Bridge
+                USDC
               </Link>
               <Link
-                href="/sui"
+                href={`${process.env.PUBLIC_URL}/sui`}
                 target="_blank"
                 rel="noopener noreferrer"
                 color="inherit"
                 className={classes.link}
               >
-                Sui Bridge
+                Sui
               </Link>
               <Link
-                href="docs"
+                href={`${process.env.PUBLIC_URL}/cosmos`}
+                target="_blank"
+                rel="noopener noreferrer"
+                color="inherit"
+                className={classes.link}
+              >
+                Cosmos
+              </Link>
+              <Link
+                href={`${process.env.PUBLIC_URL}/docs`}
                 target="_blank"
                 rel="noopener noreferrer"
                 color="inherit"
@@ -273,15 +266,17 @@ function App() {
               >
                 FAQ
               </Link>
-              <Link
-                href="https://wormhole.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                color="inherit"
-                className={classes.link}
-              >
-                Wormhole
-              </Link>
+              <Box>
+                <Link
+                  href="https://wormholescan.io"
+                  target="_blank"
+                  color="inherit"
+                  className={classes.link}
+                >
+                  Wormholescan
+                </Link>
+                <Chip className={classes.newTag} label="NEW" size="small" />
+              </Box>
             </div>
           </Hidden>
           <Hidden implementation="css" smUp>
@@ -341,7 +336,7 @@ function App() {
           >
             <Tab label="Tokens" value="/transfer" />
             <Tab label="NFTs" value="/nft" />
-            <Tab label="Redeem" value="/redeem" to="/redeem" />
+            <Tab label="Redeem" value="/redeem" />
           </Tabs>
         </Container>
       ) : null}
