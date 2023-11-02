@@ -62,7 +62,7 @@ jobs:
           path: apps/docs/build
   
   portal:
-    name: "Build Portal Bridge (Advance)"
+    name: "Build Portal Bridge [Advance]"
     runs-on: "ubuntu-latest"
     concurrency:
       group: ${{ github.ref }}-portal-preview
